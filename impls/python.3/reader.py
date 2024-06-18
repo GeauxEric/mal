@@ -30,7 +30,7 @@ PATTERN = re.compile(REGEX)
 class LispDeref:
     value: Any
 
-@dataclass
+@dataclass(frozen=True)
 class LispSymbol:
     value: str
 
