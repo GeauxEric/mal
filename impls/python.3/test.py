@@ -2,7 +2,7 @@ import unittest
 from reader import (tokenize, Reader, read_form, LispList,
                     LispNumber, FailToParseError, UnbalancedError, LispSymbol)
 from printer import pr_str
-from step3_env import rep
+from step4_if_fn_do import rep
 
 
 class TestReader(unittest.TestCase):
@@ -65,6 +65,12 @@ class TestEval(unittest.TestCase):
         self.assertEqual('8', rep('(def! b (+ a 2))'))
         self.assertEqual('14', rep('(+ a b)'))
         self.assertEqual('2', rep('(let* (c 2) c)'))
+
+    def test_fn(self):
+        self.assertEqual('#<function>', rep('(fn* (a) a)'))
+        self.assertEqual('7', rep('( (fn* (a) a) 7)'))
+        self.assertEqual('11', rep('( (fn* (a) (+ a 1)) 10)'))
+        self.assertEqual('5', rep('( (fn* (a b) (+ a b)) 2 3)'))
 
 
 if __name__ == "__main__":

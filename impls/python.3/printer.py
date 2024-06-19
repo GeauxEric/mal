@@ -1,9 +1,11 @@
-from reader import (LispType, LispList, LispNumber, LispSymbol,
+from reader import (LispType, LispList, LispNumber, LispSymbol, LispClosure,
                     LispStr, LispVec, LispHashMap, LispDeref)
 
 
 def pr_str(value: LispType) -> str:
     match value:
+        case LispClosure(_):
+            return '#<function>'
         case LispSymbol(v):
             return v
         case LispNumber(v):

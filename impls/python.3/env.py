@@ -1,3 +1,4 @@
+from typing import List
 from reader import LispType, LispSymbol
 from typing import Optional
 
@@ -12,9 +13,15 @@ class EnvNotFoundError(ValueError):
 
 
 class Env:
-    def __init__(self, outer: Optional['Env'] = None) -> None:
+    def __init__(self, outer: Optional['Env'] = None,
+                 binds: List[LispSymbol] = None,
+                 exprs: List = None) -> None:
         self._outer = outer
         self._data = {}
+        if binds is not None:
+            assert len(binds) == len(exprs)
+            for k, v in zip(binds, exprs):
+                self.set(k, v)
 
     def set(self, key: LispSymbol, value: LispType):
         self._data[key] = value

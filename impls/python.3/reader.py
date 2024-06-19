@@ -1,3 +1,4 @@
+from typing import Callable
 from numbers import Number
 from dataclasses import dataclass
 import re
@@ -26,9 +27,21 @@ class Reader:
 REGEX = r"[\s,]*(~@|[\[\]{}()'`~^@]|\"(?:\\.|[^\\\"])*\"?|;.*|[^\s\[\]{}('\"`,;)]*)"
 PATTERN = re.compile(REGEX)
 
+
+@dataclass
+class LispNil:
+    pass
+
+
+@dataclass
+class LispBool:
+    value: bool
+
+
 @dataclass
 class LispDeref:
     value: Any
+
 
 @dataclass(frozen=True)
 class LispSymbol:
@@ -47,7 +60,7 @@ class LispNumber:
 
 @dataclass
 class LispList:
-    value: List
+    value: List['LispType']
 
 
 @dataclass
@@ -60,7 +73,12 @@ class LispHashMap:
     value: List
 
 
-LispType = LispNumber | LispList | LispSymbol | LispVec
+@dataclass
+class LispClosure:
+    value: Callable
+
+
+LispType = LispNumber | LispList | LispSymbol | LispVec | LispClosure
 
 
 def tokenize(s: str) -> List[str]:
