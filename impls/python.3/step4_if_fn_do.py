@@ -2,16 +2,11 @@ from reader import read_str
 from printer import pr_str
 from typing import Optional
 from reader import (LispType, FailToParseError, UnbalancedError, LispClosure,
-                    LispSymbol, LispList, LispNumber, LispVec, LispHashMap)
+                    Nil, LispFalse, LispSymbol, LispList, LispNumber,
+                    LispVec, LispHashMap)
 
 from env import Env, EnvNotFoundError
-
-REPL_ENV = Env()
-
-REPL_ENV.set(LispSymbol('+'), lambda a, b: LispNumber(a.value+b.value))
-REPL_ENV.set(LispSymbol('-'), lambda a, b: LispNumber(a.value-b.value))
-REPL_ENV.set(LispSymbol('*'), lambda a, b: LispNumber(a.value*b.value))
-REPL_ENV.set(LispSymbol('/'), lambda a, b: LispNumber(a.value/b.value))
+from core import REPL_ENV
 
 
 def READ(x: str) -> LispType:
@@ -48,6 +43,19 @@ def EVAL(x: LispType, repl_env=Optional[Env]) -> LispType:
             if len(v) == 0:
                 return x
             match v[0]:
+                case LispSymbol('do'):
+                    for i in range(1, len(v)):
+                        e = EVAL(v[i], repl_env=repl_env)
+                        if i == len(v) - 1:
+                            return e
+                case LispSymbol('if'):
+                    condition = EVAL(v[1], repl_env=repl_env)
+                    if condition is Nil or condition is LispFalse:
+                        if len(v) == 3:
+                            return Nil
+                        return EVAL(v[3], repl_env=repl_env)
+                    else:
+                        return EVAL(v[2], repl_env=repl_env)
                 case LispSymbol('fn*'):
                     def closure(*args):
                         env = Env(outer=repl_env, binds=v[1].value, exprs=args)
@@ -86,6 +94,7 @@ def rep(x: str) -> str:
 
 if __name__ == "__main__":
     # repl loop
+    rep('(def! not (fn* (a) (if a false true)))')
     while True:
         try:
             line = input("user> ")

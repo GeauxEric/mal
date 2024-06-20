@@ -1,5 +1,5 @@
 import unittest
-from reader import (tokenize, Reader, read_form, LispList,
+from reader import (tokenize, Reader, read_form, LispList, LispBool,
                     LispNumber, FailToParseError, UnbalancedError, LispSymbol)
 from printer import pr_str
 from step4_if_fn_do import rep
@@ -66,11 +66,24 @@ class TestEval(unittest.TestCase):
         self.assertEqual('14', rep('(+ a b)'))
         self.assertEqual('2', rep('(let* (c 2) c)'))
 
+    def test_bool(self):
+        self.assertTrue(LispBool(True))
+        self.assertFalse(LispBool(False))
+
     def test_fn(self):
         self.assertEqual('#<function>', rep('(fn* (a) a)'))
         self.assertEqual('7', rep('( (fn* (a) a) 7)'))
         self.assertEqual('11', rep('( (fn* (a) (+ a 1)) 10)'))
         self.assertEqual('5', rep('( (fn* (a b) (+ a b)) 2 3)'))
+        self.assertEqual('()', rep('(list)'))
+        self.assertEqual('true', rep('(list? (list))'))
+        self.assertEqual('true', rep('(empty? (list))'))
+        self.assertEqual('3', rep('(count (list 1 2 3))'))
+        self.assertEqual('(1 2 3)', rep('(list 1 2 3)'))
+        self.assertEqual('false', rep('(> (count (list 1 2 3)) 3)'))
+        self.assertEqual('78', rep('(if (> (count (list 1 2 3)) 3) 89 78)'))
+        self.assertEqual('nil', rep('(if false (+ 1 7))'))
+        self.assertEqual('nil', rep('(do (prn 101))'))
 
 
 if __name__ == "__main__":

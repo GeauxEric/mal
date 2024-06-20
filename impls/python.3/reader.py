@@ -37,6 +37,14 @@ class LispNil:
 class LispBool:
     value: bool
 
+    def __bool__(self):
+        return self.value
+
+
+Nil = LispNil()
+LispTrue = LispBool(True)
+LispFalse = LispBool(False)
+
 
 @dataclass
 class LispDeref:

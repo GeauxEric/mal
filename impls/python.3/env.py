@@ -1,5 +1,5 @@
 from typing import List
-from reader import LispType, LispSymbol
+from reader import LispType, LispSymbol, LispList
 from typing import Optional
 
 
@@ -20,8 +20,14 @@ class Env:
         self._data = {}
         if binds is not None:
             assert len(binds) == len(exprs)
-            for k, v in zip(binds, exprs):
-                self.set(k, v)
+            for i in range(len(binds)):
+                b = binds[i]
+                if b.value == '&':
+                    next_b = binds[i+1]
+                    self.set(next_b, LispList(exprs[i:]))
+                    break
+                else:
+                    self.set(b, exprs[i])
 
     def set(self, key: LispSymbol, value: LispType):
         self._data[key] = value
