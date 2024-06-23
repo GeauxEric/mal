@@ -62,6 +62,11 @@ class LispStr:
 
 
 @dataclass
+class LispKeyword:
+    value: str
+
+
+@dataclass
 class LispNumber:
     value: Number
 
@@ -158,27 +163,33 @@ def is_integer(value):
         return False, None
 
 
-def read_atom(reader: Reader):
-    t = reader.next()
-    is_int, n = is_integer(t)
-    if is_int:
-        return LispNumber(n)
-    if t[0] == '"':
-        if len(t) == 1:
-            raise UnbalancedError
-        if t[len(t) - 1] != '"':
-            raise UnbalancedError
+def _u(x): return x
+def _s2u(x): return x
 
-        i = 1
-        while i < len(t) - 1:
-            if t[i] == '\\':
-                i += 2
-            else:
-                i += 1
-        if i == len(t):
-            raise UnbalancedError
-        return LispStr(t)
-    return LispSymbol(t)
+
+def _unescape(s):
+    return s.replace('\\\\', _u('\u029e')).replace('\\"', '"').replace('\\n', '\n').replace(_u('\u029e'), '\\')
+
+
+def read_atom(reader: Reader):
+    int_re = re.compile(r"-?[0-9]+$")
+    float_re = re.compile(r"-?[0-9][0-9.]*$")
+    string_re = re.compile(r'"(?:[\\].|[^\\"])*"')
+    token = reader.next()
+    if re.match(int_re, token):
+        i = int(token)
+        return LispNumber(i)
+    elif re.match(float_re, token):
+        i = int(token)
+        return LispNumber(i)
+    elif re.match(string_re, token):
+        return LispStr(_s2u(_unescape(token[1:-1])))
+    elif token[0] == '"':
+        raise UnbalancedError
+    elif token[0] == ':':
+        return LispKeyword(token[1:])
+    else:
+        return LispSymbol(token)
 
 
 def read_form(reader: Reader):

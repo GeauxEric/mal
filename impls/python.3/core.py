@@ -1,5 +1,5 @@
 from env import Env
-from reader import (LispSymbol, LispNumber, LispList, LispVec,
+from reader import (LispSymbol, LispNumber, LispList, LispVec, LispStr,
                     LispTrue, LispFalse, Nil, LispNil)
 from printer import pr_str
 REPL_ENV = Env()
@@ -97,11 +97,13 @@ def _eq(*args):
 
 
 def _pr_str(*args):
-    return ' '.join([pr_str(x, print_readably=True) for x in args])
+    s = ' '.join([pr_str(x, print_readably=True) for x in args])
+    return LispStr(s)
 
 
 def _str(*args):
-    return ''.join([pr_str(x, print_readably=True) for x in args])
+    s = ''.join([pr_str(x, print_readably=False) for x in args])
+    return LispStr(s)
 
 
 def _prn(*args):
@@ -121,7 +123,8 @@ REPL_ENV.set(LispSymbol('list?'), _is_list)
 REPL_ENV.set(LispSymbol('empty?'), _is_empty_list)
 REPL_ENV.set(LispSymbol('count'), _count)
 REPL_ENV.set(LispSymbol('prn'), _prn)
-REPL_ENV.set(LispSymbol('pr-str'), _prn)
+REPL_ENV.set(LispSymbol('pr-str'), _pr_str)
+REPL_ENV.set(LispSymbol('str'), _str)
 REPL_ENV.set(LispSymbol('println'), _println)
 REPL_ENV.set(LispSymbol('='), _eq)
 REPL_ENV.set(LispSymbol('<'), lambda n1,

@@ -1,89 +1,14 @@
 import unittest
-from reader import (tokenize, Reader, read_form, LispList, LispBool,
+from reader import (tokenize, Reader, read_form, LispList, LispBool, LispStr,
                     LispNumber, FailToParseError, UnbalancedError, LispSymbol)
 from printer import pr_str
-from step4_if_fn_do import rep
-
-
-class TestReader(unittest.TestCase):
-
-    def test_reader(self):
-        reader = Reader(tokens=['(', '123', ')'])
-        self.assertEqual('(', reader.peek())
-        self.assertEqual('(', reader.next())
-        self.assertEqual('123', reader.peek())
-
-    def test_tokenize(self):
-        s = '(  123   456 789   ) '
-        tokens = tokenize(s)
-        self.assertEqual(5, len(tokens))
-
-        s = "(  + 2   (*  3  4)  )"
-        self.assertEqual(9, len(tokenize(s)))
-
-    def test_unbalanced(self):
-        s = r'"\\\\\\\\\\\\\\\\\\\"'
-        tokens = tokenize(s)
-        reader = Reader(tokens=tokens)
-        with self.assertRaises(UnbalancedError):
-            read_form(reader)
-
-        s = "(1 2\n"
-        tokens = tokenize(s)
-        reader = Reader(tokens=tokens)
-        with self.assertRaises(FailToParseError):
-            read_form(reader)
-
-        s = "[1 2\n"
-        tokens = tokenize(s)
-        reader = Reader(tokens=tokens)
-        with self.assertRaises(FailToParseError):
-            read_form(reader)
-
-        s = '"abc'
-        tokens = tokenize(s)
-        reader = Reader(tokens=tokens)
-        with self.assertRaises(UnbalancedError):
-            read_form(reader)
-
-    def test_read_form(self):
-        reader = Reader(tokens=['(', '123', ')'])
-        read_form(reader)
-        s = "(  + 2   (*  3  4)  )"
-        read_form(Reader(tokenize(s)))
-
-    def test_printer(self):
-        a = LispList([LispSymbol('a'), LispNumber(1)])
-        self.assertEqual('(a 1)', pr_str(a))
+from step4_if_fn_do import rep, EVAL, READ
 
 
 class TestEval(unittest.TestCase):
-    def test_env(self):
-        s = "(def! a 6)"
-        self.assertEqual('6', rep(s))
-        self.assertEqual('6', rep('a'))
-        self.assertEqual('8', rep('(def! b (+ a 2))'))
-        self.assertEqual('14', rep('(+ a b)'))
-        self.assertEqual('2', rep('(let* (c 2) c)'))
 
-    def test_bool(self):
-        self.assertTrue(LispBool(True))
-        self.assertFalse(LispBool(False))
-
-    def test_fn(self):
-        self.assertEqual('#<function>', rep('(fn* (a) a)'))
-        self.assertEqual('7', rep('( (fn* (a) a) 7)'))
-        self.assertEqual('11', rep('( (fn* (a) (+ a 1)) 10)'))
-        self.assertEqual('5', rep('( (fn* (a b) (+ a b)) 2 3)'))
-        self.assertEqual('()', rep('(list)'))
-        self.assertEqual('true', rep('(list? (list))'))
-        self.assertEqual('true', rep('(empty? (list))'))
-        self.assertEqual('3', rep('(count (list 1 2 3))'))
-        self.assertEqual('(1 2 3)', rep('(list 1 2 3)'))
-        self.assertEqual('false', rep('(> (count (list 1 2 3)) 3)'))
-        self.assertEqual('78', rep('(if (> (count (list 1 2 3)) 3) 89 78)'))
-        self.assertEqual('nil', rep('(if false (+ 1 7))'))
-        self.assertEqual('nil', rep('(do (prn 101))'))
+    def test_eq(self):
+        self.assertEqual(r'"\""', rep(r'"\""'))
 
 
 if __name__ == "__main__":

@@ -85,7 +85,7 @@ def EVAL(x: LispType, repl_env=Optional[Env]) -> LispType:
 
 
 def PRINT(x: LispType) -> str:
-    return pr_str(x)
+    return pr_str(x, print_readably=True)
 
 
 def rep(x: str) -> str:
