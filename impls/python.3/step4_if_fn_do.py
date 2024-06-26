@@ -2,8 +2,7 @@ from reader import read_str
 from printer import pr_str
 from typing import Optional
 from reader import (LispType, FailToParseError, UnbalancedError, LispClosure,
-                    Nil, LispFalse, LispSymbol, LispList, LispNumber,
-                    LispVec, LispHashMap)
+                    Nil, LispFalse, LispSymbol, LispList, LispVec, LispHashMap)
 
 from env import Env, EnvNotFoundError
 from core import REPL_ENV

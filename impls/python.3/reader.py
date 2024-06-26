@@ -89,6 +89,9 @@ class LispHashMap:
 @dataclass
 class LispClosure:
     value: Callable
+    ast: Any
+    params: Any
+    env: Any
 
 
 LispType = LispNumber | LispList | LispSymbol | LispVec | LispClosure
