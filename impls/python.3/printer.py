@@ -1,5 +1,6 @@
-from reader import (LispType, LispList, LispNumber, LispSymbol, LispClosure, LispNil, LispKeyword,
-                    LispStr, LispVec, LispHashMap, LispDeref, LispBool)
+from reader import (LispType, LispList, LispNumber, LispSymbol, LispClosure,
+                    LispNil, LispKeyword, LispStr, LispVec, LispHashMap,
+                    LispDeref, LispBool, Atom)
 
 
 def _escape(s):
@@ -8,6 +9,8 @@ def _escape(s):
 
 def pr_str(value: LispType, print_readably: bool = True) -> str:
     match value:
+        case Atom(value):
+            return f"(atom {pr_str(value=value, print_readably=print_readably)})"
         case LispClosure(_):
             return '#<function>'
         case LispSymbol(v):

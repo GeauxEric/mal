@@ -97,6 +97,11 @@ class LispClosure:
 LispType = LispNumber | LispList | LispSymbol | LispVec | LispClosure
 
 
+@dataclass
+class Atom:
+    value: LispType
+
+
 def tokenize(s: str) -> List[str]:
     matches = PATTERN.findall(s)
     tokens = []
@@ -192,6 +197,8 @@ def read_atom(reader: Reader):
     elif token[0] == ':':
         return LispKeyword(token[1:])
     else:
+        if token == "nil":
+            return Nil
         return LispSymbol(token)
 
 
@@ -199,6 +206,9 @@ def read_form(reader: Reader):
     t = reader.peek()
     if t == '':
         return
+    if t == '@':
+        reader.next()
+        return LispList([LispSymbol("deref"), read_form(reader)])
     if t == '\'':
         reader.next()
         return LispList([LispSymbol("quote"), read_form(reader)])

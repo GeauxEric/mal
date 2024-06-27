@@ -1,6 +1,7 @@
 from env import Env
-from reader import (LispSymbol, LispNumber, LispList, LispVec, LispStr,
-                    LispTrue, LispFalse, Nil, LispNil)
+from reader import (LispSymbol, LispNumber, LispList, LispVec, LispStr, Atom,
+                    LispType, LispClosure, LispTrue, LispFalse, Nil, LispNil,
+                    read_str)
 from printer import pr_str
 REPL_ENV = Env()
 
@@ -90,6 +91,11 @@ def _eq(*args):
         case _:
             if not isinstance(a0, type(a1)):
                 return LispFalse
+            if a0 is Nil:
+                if a1 is Nil:
+                    return LispTrue
+                else:
+                    return LispFalse
             if a0.value == a1.value:
                 return LispTrue
             else:
@@ -118,6 +124,50 @@ def _println(*args):
     return Nil
 
 
+def _read_string(s: LispStr):
+    return read_str(s.value)
+
+
+def _slurp(path: LispStr):
+    with open(path.value, 'r') as ifs:
+        c = ifs.read()
+        return LispStr(c)
+
+
+def _is_atom(x):
+    match x:
+        case Atom(_):
+            return LispTrue
+        case _:
+            return LispFalse
+
+
+def _deref(atom: Atom):
+    return atom.value
+
+
+def _reset(atom: Atom, value: LispType):
+    atom.value = value
+    return value
+
+
+def _swap(atom: Atom, fn, *args):
+    match fn:
+        case LispClosure(function, _, _, _):
+            value = function(atom.value, *args)
+            atom.value = value
+            return value
+        case _:
+            value = fn(atom.value, *args)
+            atom.value = value
+            return value
+
+
+REPL_ENV.set(LispSymbol('swap!'), _swap)
+REPL_ENV.set(LispSymbol('reset!'), _reset)
+REPL_ENV.set(LispSymbol('deref'), _deref)
+REPL_ENV.set(LispSymbol('atom?'), _is_atom)
+REPL_ENV.set(LispSymbol('atom'), lambda x: Atom(x))
 REPL_ENV.set(LispSymbol('list'), _create_list)
 REPL_ENV.set(LispSymbol('list?'), _is_list)
 REPL_ENV.set(LispSymbol('empty?'), _is_empty_list)
@@ -126,6 +176,8 @@ REPL_ENV.set(LispSymbol('prn'), _prn)
 REPL_ENV.set(LispSymbol('pr-str'), _pr_str)
 REPL_ENV.set(LispSymbol('str'), _str)
 REPL_ENV.set(LispSymbol('println'), _println)
+REPL_ENV.set(LispSymbol('read-string'), _read_string)
+REPL_ENV.set(LispSymbol('slurp'), _slurp)
 REPL_ENV.set(LispSymbol('='), _eq)
 REPL_ENV.set(LispSymbol('<'), lambda n1,
              n2: LispTrue if n1.value < n2.value else LispFalse)
