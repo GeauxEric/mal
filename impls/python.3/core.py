@@ -163,6 +163,31 @@ def _swap(atom: Atom, fn, *args):
             return value
 
 
+def _cons(x: LispType, li: LispList | LispVec):
+    return LispList([x] + li.value)
+
+
+def _concat(*args):
+    result = []
+    for li in args:
+        result.extend(li.value)
+    return LispList(result)
+
+
+def _vec(*args):
+    match args[0]:
+        case LispList(li):
+            return LispVec(li)
+        case LispVec(_):
+            return args[0]
+        case _:
+            print(args[0])
+            raise TypeError
+
+
+REPL_ENV.set(LispSymbol('vec'), _vec)
+REPL_ENV.set(LispSymbol('concat'), _concat)
+REPL_ENV.set(LispSymbol('cons'), _cons)
 REPL_ENV.set(LispSymbol('swap!'), _swap)
 REPL_ENV.set(LispSymbol('reset!'), _reset)
 REPL_ENV.set(LispSymbol('deref'), _deref)

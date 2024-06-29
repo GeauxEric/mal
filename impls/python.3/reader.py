@@ -206,6 +206,14 @@ def read_form(reader: Reader):
     t = reader.peek()
     if t == '':
         return
+    if t == '\'':
+        reader.next()
+        return LispList([LispSymbol('quote'), read_form(reader)])
+    if t == '`':
+        reader.next()
+        rest = read_form(reader)
+        print(rest)
+        return LispList([LispSymbol('quasiquote'), rest])
     if t == '@':
         reader.next()
         return LispList([LispSymbol("deref"), read_form(reader)])

@@ -11,6 +11,9 @@ class EnvNotFoundError(ValueError):
     def get_missing_env_key(self):
         return self._env_key
 
+    def __str__(self) -> str:
+        return f"{self._env_key} is not found"
+
 
 class Env:
     def __init__(self, outer: Optional['Env'] = None,
