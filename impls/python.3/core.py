@@ -185,6 +185,37 @@ def _vec(*args):
             raise TypeError
 
 
+def _nth(li: LispList | LispVec, n: LispNumber):
+    return li.value[n.value]
+
+
+def _first(li: LispList | LispVec | LispNil):
+    match li:
+        case LispNil():
+            return Nil
+        case LispList(v):
+            return Nil if len(v) == 0 else v[0]
+        case LispVec(v):
+            return Nil if len(v) == 0 else v[0]
+
+
+def _rest(li: LispList | LispVec | LispNil):
+    match li:
+        case LispNil():
+            return LispList([])
+        case LispList([]):
+            return LispList([])
+        case LispList([_, *rest]):
+            return LispList(rest)
+        case LispVec([]):
+            return LispList([])
+        case LispVec([_, *rest]):
+            return LispList(rest)
+
+
+REPL_ENV.set(LispSymbol('rest'), _rest)
+REPL_ENV.set(LispSymbol('first'), _first)
+REPL_ENV.set(LispSymbol('nth'), _nth)
 REPL_ENV.set(LispSymbol('vec'), _vec)
 REPL_ENV.set(LispSymbol('concat'), _concat)
 REPL_ENV.set(LispSymbol('cons'), _cons)

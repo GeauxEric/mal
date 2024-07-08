@@ -2,7 +2,7 @@ import unittest
 from reader import (tokenize, Reader, read_form, LispList, LispBool, LispStr,
                     LispNumber, FailToParseError, UnbalancedError, LispSymbol)
 from printer import pr_str
-from step7_quote import rep, EVAL, READ
+from step8_macros import rep, EVAL, READ
 from core import _read_string
 
 

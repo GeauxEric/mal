@@ -92,6 +92,7 @@ class LispClosure:
     ast: Any
     params: Any
     env: Any
+    is_macro: bool = False
 
 
 LispType = LispNumber | LispList | LispSymbol | LispVec | LispClosure
